@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:"><title>Rezeption Assistent</title>
+<style>
+:root{--bg:#eef3f3;--sf:#fff;--ink:#12262b;--mut:#5a6f74;--ln:#d7e1e2;--pr:#0d6e6e;--prt:#fff;--soft:#dcefee;--al:#c2412d;--ok:#2b7a4b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a1d;--sf:#15262a;--ink:#e6f0f0;--mut:#93abae;--ln:#26403f;--pr:#4cc2bd;--prt:#062524;--soft:#1b3a3a;--al:#ff8a73;--ok:#6fd195;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1a1d;--sf:#15262a;--ink:#e6f0f0;--mut:#93abae;--ln:#26403f;--pr:#4cc2bd;--prt:#062524;--soft:#1b3a3a;--al:#ff8a73;--ok:#6fd195;color-scheme:dark}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
+.app{display:grid;grid-template-columns:200px minmax(0,1fr) 390px;height:100%}
+nav{background:var(--sf);border-right:1px solid var(--ln);padding:20px 12px;display:flex;flex-direction:column;gap:4px}
+nav .brand{font-weight:700;font-size:18px;padding:0 10px 16px}
+nav button{all:unset;cursor:pointer;padding:9px 10px;border-radius:8px;color:var(--mut);font-weight:500}
+nav button:hover{background:var(--soft)}
+nav button.on{background:var(--soft);color:var(--pr);font-weight:700}
+main{overflow:auto;padding:28px 32px}
+h1{font-size:26px;margin:0 0 2px;letter-spacing:-.01em}
+h2{font-size:16px;margin:28px 0 8px}
+.mut{color:var(--mut);margin:0}
+.kp{display:flex;flex-wrap:wrap;gap:0;margin:20px 0 0;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln)}
+.kp div{flex:1 1 130px;padding:14px 16px 14px 0;color:var(--mut);font-size:13px}
+.kp b{display:block;font-size:26px;color:var(--ink);font-weight:700}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-weight:600;color:var(--mut);font-size:13px;padding:6px 8px;border-bottom:1px solid var(--ln)}
+td{padding:10px 8px;border-bottom:1px solid var(--ln);vertical-align:middle}
+.wrap{overflow-x:auto}
+.tag{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600;background:var(--soft);color:var(--pr)}
+.tag.off{background:transparent;border:1px solid var(--ln);color:var(--mut)}
+.lnk{all:unset;cursor:pointer;color:var(--pr);font-weight:600;font-size:13px;margin-right:12px}
+.lnk.d{color:var(--al)}
+.empty{padding:18px 0;color:var(--mut)}
+.task{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln)}
+.task.done span{text-decoration:line-through;color:var(--mut)}
+input[type=text]{font:inherit;color:inherit;background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:9px 12px;width:100%}
+:focus-visible{outline:2px solid var(--pr);outline-offset:2px}
+aside{background:var(--sf);border-left:1px solid var(--ln);display:flex;flex-direction:column;min-height:0}
+aside header{padding:18px 20px 12px;border-bottom:1px solid var(--ln)}
+aside header b{font-size:16px}
+.msgs{flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:92%;padding:10px 13px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word}
+.m.a{background:var(--soft);border-bottom-left-radius:4px}
+.m.u{background:var(--pr);color:var(--prt);align-self:flex-end;border-bottom-right-radius:4px}
+.m pre{white-space:pre-wrap;font:inherit;margin:8px 0 0;padding:10px;background:var(--sf);border:1px solid var(--ln);border-radius:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 10px}
+.chips button{all:unset;cursor:pointer;font-size:12.5px;padding:4px 10px;border:1px solid var(--ln);border-radius:99px;color:var(--mut)}
+.chips button:hover{border-color:var(--pr);color:var(--pr)}
+.send{display:flex;gap:8px;padding:12px 20px 18px;border-top:1px solid var(--ln)}
+.send button{all:unset;cursor:pointer;background:var(--pr);color:var(--prt);font-weight:700;padding:0 18px;border-radius:8px;display:flex;align-items:center}
+@media (max-width:980px){
+ body{height:auto}.app{grid-template-columns:1fr;height:auto}
+ nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--ln);padding:10px}
+ nav .brand{display:none}main{padding:20px 16px}
+ aside{border-left:0;border-top:1px solid var(--ln);height:70vh}
+}
+</style></head>
+<body>
+<div class="app">
+ <nav id="nav"></nav>
+ <main id="main"></main>
+ <aside>
+  <header><b>Assistent</b><p class="mut" style="font-size:13px">Läuft lokal im Browser, ohne API und ohne Cloud.</p></header>
+  <div class="msgs" id="msgs" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <form class="send" id="f"><input type="text" id="q" placeholder="Schreib eine Anweisung …" autocomplete="off" aria-label="Anweisung an den Assistenten"><button>Senden</button></form>
+ </aside>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const p2=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());
+const today=()=>iso(new Date());
+const dt=s=>{const[y,m,d]=s.split("-");return d+"."+m+"."+y};
+const eur=n=>n.toFixed(2).replace(".",",")+" €";
+const TYPES=["Physiotherapie","Massage","Ergotherapie","Lymphdrainage","Rehasport","Nachsorge","Selbstzahler"];
+let S,view="heute",chat=[];
+
+function seed(){const a=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+ return{id:10,
+ clients:[{id:1,name:"Anna Berger",st:"aktiv",kt:"AOK Rheinland",zu:"Dr. Weber"},{id:2,name:"Mehmet Yilmaz",st:"aktiv",kt:"TK",zu:"Dr. Kraus"},{id:3,name:"Petra Lang",st:"aktiv",kt:"Selbstzahlerin",zu:"-"}],
+ appts:[{id:1,cid:1,ty:"Physiotherapie",d:a(0),t:"08:00"},{id:2,cid:2,ty:"Rehasport",d:a(0),t:"09:30"},{id:3,cid:3,ty:"Massage",d:a(1),t:"10:00"}],
+ tasks:[{t:"Heilmittelverordnungen auf Vollständigkeit prüfen",d:0},{t:"Rehasport-Anwesenheitsliste abgleichen",d:0},{t:"Kassenabschluss erstellen",d:0},{t:"Wochenstatistik eintragen",d:0}],cash:[]}}
+function load(){try{S=JSON.parse(localStorage.getItem("rz1"))}catch(e){}if(!S)S=seed()}
+function save(){try{localStorage.setItem("rz1",JSON.stringify(S))}catch(e){}}
+const cl=id=>S.clients.find(c=>c.id===id);
+const byT=(a,b)=>(a.d+a.t).localeCompare(b.d+b.t);
+
+/* ---------- Sprachverständnis (regelbasiert, lokal) ---------- */
+function findC(low){return S.clients.find(c=>c.name.toLowerCase().split(" ").some(w=>w.length>2&&low.includes(w)))}
+function pDate(low){const n=new Date();
+ if(/übermorgen/.test(low)){n.setDate(n.getDate()+2);return iso(n)}
+ if(/\bmorgen\b/.test(low)){n.setDate(n.getDate()+1);return iso(n)}
+ const m=low.match(/(\d{1,2})\.(\d{1,2})\.?(\d{4})?/);
+ if(m)return (m[3]||n.getFullYear())+"-"+p2(m[2])+"-"+p2(m[1]);
+ const w=["sonntag","montag","dienstag","mittwoch","donnerstag","freitag","samstag"];
+ for(let i=0;i<7;i++)if(low.includes(w[i])){n.setDate(n.getDate()+((i-n.getDay()+7)%7||7));return iso(n)}
+ return today()}
+function pTime(low){let m=low.match(/(\d{1,2}):(\d{2})/);if(m)return p2(m[1])+":"+m[2];m=low.match(/(\d{1,2})\s*uhr/);return m?p2(m[1])+":00":null}
+function free(d,from){let h=from?+from.split(":")[0]:6,m=from?+from.split(":")[1]:30;
+ for(let i=0;i<60;i++){m+=30;if(m>=60){h++;m-=60}if(h*60+m>20*60+30)return null;const s=p2(h)+":"+p2(m);if(!S.appts.some(a=>a.d===d&&a.t===s))return s}return null}
+function mail(c,low){
+ if(/entlass|zuweis|arzt|ärztin/.test(low))
+  return `Betreff: Rückmeldung zu ${c.name}\n\nSehr geehrte/r ${c.zu&&c.zu!=="-"?c.zu:"Kollege/Kollegin"},\n\nwir möchten Sie über den Stand der Rehabilitation von ${c.name} informieren. Der Abschlussbericht folgt gesondert. Bei Rückfragen erreichen Sie uns jederzeit an der Rezeption.\n\nMit freundlichen Grüßen\n[Ihr Name], Rezeption`;
+ return `Betreff: Kostenzusage / Verlängerung – ${c.name}\n\nSehr geehrte Damen und Herren,\n\nfür unseren Rehakunden ${c.name} (Kostenträger: ${c.kt}) bitten wir um Prüfung der Kostenzusage bzw. Verlängerung der bewilligten Leistungen. Die aktuellen Unterlagen liegen bei.\n\nMit freundlichen Grüßen\n[Ihr Name], Rezeption`}
+
+function ask(raw){
+ const low=raw.toLowerCase().trim(),c=findC(low);
+ if(/^(hilfe|help|\?)/.test(low))return say(`Das kann ich:\n• Aufnahme Max Muster kasse TK\n• Entlassung Berger\n• Termin Berger morgen 10 Uhr Massage\n• Kasse 25 Lang Selbstzahler\n• Brief an Kostenträger für Berger\n• Mail an Zuweiser für Yilmaz\n• Termine heute / morgen / Freitag\n• Suche Lang`);
+ if(/^(neuer kunde|neu|aufnahme|aufnehmen)/i.test(low)){
+  const r=raw.replace(/^(neuer kunde|neu|aufnahme|aufnehmen)\s*:?\s*/i,"").split(/\s+(?:kasse|kt|bei)\s+/i);
+  const name=r[0].trim();if(!name)return say("Wie heißt der Kunde? Beispiel: „Aufnahme Max Muster kasse TK“.");
+  S.clients.push({id:++S.id,name,st:"aktiv",kt:(r[1]||"offen").trim(),zu:"-"});
+  S.tasks.push({t:`Kundendaten und Verordnung von ${name} vollständig erfassen`,d:0});save();
+  return say(`${name} ist aufgenommen. Ich habe dir eine Aufgabe für die Datenerfassung angelegt. Soll ich gleich einen Termin buchen?`)}
+ if(/entlass/.test(low)){
+  if(!c)return say("Wen soll ich entlassen? Nenne bitte den Nachnamen.");
+  const n=S.appts.filter(a=>a.cid===c.id&&a.d>=today()).length;
+  c.st="entlassen";S.appts=S.appts.filter(a=>!(a.cid===c.id&&a.d>=today()));
+  S.tasks.push({t:`Entlassbericht für ${c.name} an Zuweiser senden`,d:0});save();
+  return say(`${c.name} ist entlassen. ${n} künftige Termine habe ich storniert. Aufgabe „Entlassbericht senden“ ist angelegt.`,mail(c,"entlass"))}
+ if(/\b(brief|mail|e-mail|schreib|nachricht)/.test(low)){
+  if(!c)return say("Für wen soll ich den Entwurf schreiben?");
+  return say(`Entwurf für ${c.name}:`,mail(c,low))}
+ if(/termin|buche|einplan|vereinbar/.test(low)&&c){
+  const ty=TYPES.find(t=>low.includes(t.toLowerCase().slice(0,6)));
+  if(!ty)return say("Welche Leistung? "+TYPES.join(", ")+".");
+  const d=pDate(low);let t=pTime(low);
+  if(t&&(t<"06:00"||t>"20:30"))return say("Das liegt außerhalb des Dienstfensters (06:00–20:30 Uhr). Nenne eine andere Zeit.");
+  let note="";
+  if(!t){t=free(d,"07:30");note=" (erster freier Slot)"}
+  else if(S.appts.some(a=>a.d===d&&a.t===t)){const f=free(d,t);return say(`Um ${t} Uhr ist am ${dt(d)} schon ein Termin. Nächster freier Slot: ${f||"keiner mehr"}.`)}
+  if(!t)return say("Der Tag ist voll. Soll ich einen anderen Tag suchen?");
+  if(c.st!=="aktiv")return say(`${c.name} ist entlassen. Erst neu aufnehmen, dann buchen.`);
+  S.appts.push({id:++S.id,cid:c.id,ty,d,t});save();
+  return say(`Gebucht: ${c.name}, ${ty}, ${dt(d)} um ${t} Uhr${note}.`)}
+ if(/kasse|zahlung|bezahl|bar\b|€|euro/.test(low)&&/\d/.test(low)){
+  const m=low.match(/(\d+(?:[.,]\d{1,2})?)/),amt=parseFloat(m[1].replace(",","."));
+  const ty=TYPES.find(t=>low.includes(t.toLowerCase().slice(0,6)));
+  S.cash.push({id:++S.id,amt,txt:(ty||"Zahlung")+(c?" – "+c.name:""),d:today()});save();
+  const sum=S.cash.filter(x=>x.d===today()).reduce((s,x)=>s+x.amt,0);
+  return say(`Verbucht: ${eur(amt)}${c?" von "+c.name:""}. Kasse heute: ${eur(sum)}.`)}
+ if(/termine|heute|übersicht|was steht/.test(low)&&!c){
+  const d=pDate(low),ap=S.appts.filter(a=>a.d===d).sort(byT);
+  return say(ap.length?`Termine am ${dt(d)}:\n`+ap.map(a=>`${a.t}  ${cl(a.cid).name} – ${a.ty}`).join("\n"):`Am ${dt(d)} ist nichts eingetragen.`)}
+ if(c){const ap=S.appts.filter(a=>a.cid===c.id&&a.d>=today()).sort(byT);
+  return say(`${c.name} (${c.st})\nKostenträger: ${c.kt}\nZuweiser: ${c.zu}\nNächste Termine: ${ap.length?ap.map(a=>dt(a.d)+" "+a.t+" "+a.ty).join("; "):"keine"}`)}
+ say("Das habe ich nicht verstanden. Tippe „Hilfe“, dann zeige ich dir die Befehle.")}
+function say(h,draft){chat.push({r:"a",h,draft});draw()}
+
+/* ---------- Ansichten ---------- */
+function tbl(ap,withDate){
+ if(!ap.length)return `<p class="empty">Keine Termine. Schreibe rechts z. B. „Termin Berger morgen 10 Uhr Massage“.</p>`;
+ return `<div class="wrap"><table><tr>${withDate?"<th>Datum</th>":""}<th>Zeit</th><th>Kunde</th><th>Leistung</th><th></th></tr>`+
+ ap.map(a=>`<tr>${withDate?`<td>${dt(a.d)}</td>`:""}<td>${a.t}</td><td>${esc(cl(a.cid)?.name||"?")}</td><td><span class="tag">${a.ty}</span></td><td><button class="lnk d" data-act="del" data-id="${a.id}">Absagen</button></td></tr>`).join("")+`</table></div>`}
+const V={
+ heute(){const t=today(),ap=S.appts.filter(a=>a.d===t).sort(byT),open=S.tasks.filter(x=>!x.d).length,sum=S.cash.filter(x=>x.d===t).reduce((s,x)=>s+x.amt,0);
+  return `<h1>Heute, ${dt(t)}</h1><p class="mut">${new Date().getDay()===6?"Samstagsdienst 07:45–15:00 Uhr":"Dienstfenster 06:00–20:30 Uhr"}</p>
+  <div class="kp"><div><b>${ap.length}</b>Termine heute</div><div><b>${S.clients.filter(c=>c.st==="aktiv").length}</b>Kunden in Reha</div><div><b>${open}</b>offene Aufgaben</div><div><b>${eur(sum)}</b>Kasse heute</div></div>
+  <h2>Terminplan</h2>${tbl(ap)}`},
+ termine(){return `<h1>Termine</h1><p class="mut">Heilmittel, Rehasport, Nachsorge, Selbstzahler</p>${tbl([...S.appts].sort(byT).filter(a=>a.d>=today()),1)}`},
+ kunden(){return `<h1>Kunden</h1><p class="mut">Aufnahme per Assistent, Entlassung hier oder per Befehl</p><div class="wrap"><table><tr><th>Name</th><th>Kostenträger</th><th>Zuweiser</th><th>Status</th><th></th></tr>`+
+  S.clients.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.kt)}</td><td>${esc(c.zu)}</td><td><span class="tag ${c.st==="aktiv"?"":"off"}">${c.st}</span></td><td>${c.st==="aktiv"?`<button class="lnk d" data-act="dis" data-id="${c.id}">Entlassen</button>`:""}<button class="lnk" data-act="mail" data-id="${c.id}">Entwurf</button></td></tr>`).join("")+`</table></div>`},
+ aufgaben(){return `<h1>Aufgaben und Kontrolllisten</h1><p class="mut">Vollständigkeit, Statistik, Abschlüsse</p><div style="margin:14px 0">`+
+  S.tasks.map((x,i)=>`<label class="task ${x.d?"done":""}"><input type="checkbox" data-act="tk" data-id="${i}" ${x.d?"checked":""}><span>${esc(x.t)}</span></label>`).join("")+
+  `</div><form id="tf"><input type="text" id="tn" placeholder="Neue Aufgabe eintragen und Enter drücken" aria-label="Neue Aufgabe"></form>`},
+ kasse(){const t=today(),r=S.cash.filter(x=>x.d===t),sum=r.reduce((s,x)=>s+x.amt,0);
+  return `<h1>Kasse</h1><p class="mut">Buchen per Assistent: „Kasse 25 Lang Massage“</p><div class="kp"><div><b>${eur(sum)}</b>Tagessumme</div><div><b>${r.length}</b>Buchungen</div></div>`+
+  (r.length?`<div class="wrap"><table><tr><th>Beleg</th><th>Betrag</th></tr>${r.map(x=>`<tr><td>${esc(x.txt)}</td><td>${eur(x.amt)}</td></tr>`).join("")}</table></div>`:`<p class="empty">Heute noch keine Buchung.</p>`)}
+};
+const NAV=[["heute","Heute"],["termine","Termine"],["kunden","Kunden"],["aufgaben","Aufgaben"],["kasse","Kasse"]];
+function draw(){
+ $("#nav").innerHTML=`<div class="brand">Rezeption</div>`+NAV.map(n=>`<button data-act="nav" data-id="${n[0]}" class="${view===n[0]?"on":""}">${n[1]}</button>`).join("");
+ $("#main").innerHTML=V[view]();
+ $("#msgs").innerHTML=chat.map((m,i)=>`<div class="m ${m.r}">${m.r==="u"?esc(m.h):m.h.replace(/</g,"&lt;")}${m.draft?`<pre>${esc(m.draft)}</pre><button class="lnk" data-act="cp" data-id="${i}" style="margin-top:6px">Kopieren</button>`:""}</div>`).join("");
+ const ms=$("#msgs");ms.scrollTop=ms.scrollHeight;
+ const tf=$("#tf");if(tf)tf.onsubmit=e=>{e.preventDefault();const v=$("#tn").value.trim();if(v){S.tasks.push({t:v,d:0});save();draw()}};
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act,id=b.dataset.id;
+ if(a==="nav"){view=id;draw()}
+ if(a==="del"){S.appts=S.appts.filter(x=>x.id!=id);save();draw()}
+ if(a==="dis"){chat.push({r:"u",h:"Entlassung "+cl(+id).name});ask("Entlassung "+cl(+id).name)}
+ if(a==="mail"){const c=cl(+id);say("Entwurf für "+esc(c.name)+":",mail(c,""))}
+ if(a==="cp"){const t=chat[id].draft;try{navigator.clipboard.writeText(t);b.textContent="Kopiert"}catch(x){b.textContent="Bitte manuell markieren"}}
+});
+document.addEventListener("change",e=>{if(e.target.dataset.act==="tk"){S.tasks[+e.target.dataset.id].d=e.target.checked?1:0;save();draw()}});
+$("#f").onsubmit=e=>{e.preventDefault();const v=$("#q").value.trim();if(!v)return;$("#q").value="";chat.push({r:"u",h:v});ask(v)};
+$("#chips").innerHTML=["Termine heute","Hilfe","Aufnahme Max Muster kasse TK","Termin Berger morgen 10 Uhr Massage"].map(c=>`<button type="button">${c}</button>`).join("");
+$("#chips").onclick=e=>{if(e.target.tagName==="BUTTON"){$("#q").value=e.target.textContent;$("#q").focus()}};
+load();chat.push({r:"a",h:"Hallo! Ich helfe dir bei Aufnahme, Entlassung, Terminen, Kasse und Briefen an Zuweiser oder Kostenträger. Tippe „Hilfe“ für alle Befehle."});draw();
+</script>
+</body></html>
